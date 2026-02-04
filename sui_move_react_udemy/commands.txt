@@ -1,0 +1,33 @@
+# Calling a function from our published package, call inside of voting_system folder
+# Gas budget means how much we are willing to spend on this transaction
+# The third arguement after the description is the expiration date in unix format
+sui client call \
+  --package 0x849a1d82aa0f14166c96d09b67134db2db92e5db82a55db2921e7663825a1fea \
+  --module dashboard \
+  --function create_proposal \
+  --args "Proposal 1" "Proposal Description 1" 1801673309 \
+  --gas-budget 100000000
+
+# Another way of calling a function from our package (ptb: programmable transaction block)
+sui client ptb \
+  --move-call 0x849a1d82aa0f14166c96d09b67134db2db92e5db82a55db2921e7663825a1fea::dashboard::create_proposal \
+  '"Proposal 2"' \
+  '"Description 2"' \
+  1801673309
+
+# Calling our function multiple times in one command
+sui client ptb \
+  --move-call 0x849a1d82aa0f14166c96d09b67134db2db92e5db82a55db2921e7663825a1fea::dashboard::create_proposal \
+  '"Proposal 3"' '"Description 3"' 1801673309 \
+  --move-call 0x849a1d82aa0f14166c96d09b67134db2db92e5db82a55db2921e7663825a1fea::dashboard::create_proposal \
+  '"Proposal 4"' '"Description 4"' 1801673309 \
+  --move-call 0x849a1d82aa0f14166c96d09b67134db2db92e5db82a55db2921e7663825a1fea::dashboard::create_proposal \
+  '"Proposal 5"' '"Description 5"' 1801673309
+
+sui client ptb \
+  --move-call 0x849a1d82aa0f14166c96d09b67134db2db92e5db82a55db2921e7663825a1fea::dashboard::create_proposal \
+  '"Proposal 6"' '"Description 6"' 1801673309 \
+  --split-coins gas "[1000]" \
+  --assign coin \
+  --transfer-objects "[coin]" @0xf83ddb425dc3c33686675c0d7e62ee72884d18edf2286389c2aa2f601848020c \
+  --gas-budget 100000000
