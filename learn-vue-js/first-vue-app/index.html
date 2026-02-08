@@ -22,6 +22,15 @@
       <p>&copy; 2025</p>
     </footer>
   </div>
+  <script>
+    const { createApp, ref } = Vue
+    createApp({
+      setup() {
+        const name = ref("Rein")
+        return { name }
+      }
+    }).mount("#app")
+  </script>
 </body>
 
 </html>

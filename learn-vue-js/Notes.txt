@@ -1,0 +1,5 @@
+# Notes
+
+#### Creating a vue project
+
+npm create vue@latest
