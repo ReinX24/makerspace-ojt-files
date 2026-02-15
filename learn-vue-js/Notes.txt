@@ -3,3 +3,7 @@
 #### Creating a vue project
 
 npm create vue@latest
+
+#### Running a vue project
+
+npm run dev
