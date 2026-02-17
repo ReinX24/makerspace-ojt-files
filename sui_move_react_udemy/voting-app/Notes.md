@@ -34,3 +34,7 @@ sui client publish --gas-budget 100000000
 #### Published package
 
 https://suiscan.xyz/testnet/object/0x849a1d82aa0f14166c96d09b67134db2db92e5db82a55db2921e7663825a1fea/tx-blocks
+
+#### Installing tanstack
+
+npm add @tanstack/react-query
