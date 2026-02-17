@@ -3,6 +3,7 @@
 https://github.com/Jerga99/react-simple-template
 
 #### Run system
+
 pnpm dev
 
 # SUI Account Address
@@ -38,3 +39,13 @@ https://suiscan.xyz/testnet/object/0x849a1d82aa0f14166c96d09b67134db2db92e5db82a
 #### Installing tanstack
 
 npm add @tanstack/react-query
+
+#### Installing packages for using sui in our project
+
+npm install @mysten/dapp-kit-react @mysten/dapp-kit-core @mysten/sui@latest
+
+#### Updating to use the updated version
+
+npm uninstall @mysten/dapp-kit
+
+npm install @mysten/dapp-kit-core @mysten/dapp-kit-react @mysten/sui @tanstack/react-query
