@@ -6,7 +6,7 @@ const getGrpcUrl = (network: string) =>
 
 export const dAppKit = createDAppKit({
   networks: ["devnet", "testnet", "mainnet"],
-  defaultNetwork: "devnet",
+  defaultNetwork: "testnet",
   createClient(network) {
     return new SuiGrpcClient({
       network,
