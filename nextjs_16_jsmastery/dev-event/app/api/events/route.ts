@@ -53,6 +53,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const tags = JSON.parse(formData.get("tags") as string);
+    const agenda = JSON.parse(formData.get("agenda") as string);
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -79,7 +82,11 @@ export async function POST(req: NextRequest) {
     eventData.image = (uploadResult as { secure_url: string }).secure_url;
 
     // Storing the event data in the database
-    const createdEvent = await Event.create(eventData);
+    const createdEvent = await Event.create({
+      ...eventData,
+      tags: tags,
+      agenda: agenda,
+    });
 
     return NextResponse.json(
       {

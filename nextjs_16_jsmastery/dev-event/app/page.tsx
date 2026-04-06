@@ -2,13 +2,20 @@
 import EventCard from "@/components/EventCard";
 import ExploreBtn from "@/components/ExploreBtn";
 import { IEvent } from "@/database";
+import { cacheLife } from "next/cache";
+import { getAllEvents } from "@/lib/actions/event.actions";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+async function getEvents() {
+  "use cache";
+  cacheLife("hours");
+  const rawEvents = await getAllEvents();
+
+  // This strips out all Mongoose methods and converts complex objects (like _id) to plain strings
+  return JSON.parse(JSON.stringify(rawEvents));
+}
 
 const Page = async () => {
-  const response = await fetch(`${BASE_URL}/api/events`);
-
-  const { events } = await response.json();
+  const events: IEvent[] = await getEvents();
 
   return (
     <section>
@@ -28,7 +35,7 @@ const Page = async () => {
           {events &&
             events.length > 0 &&
             events.map((event: IEvent) => (
-              <li key={event.title}>
+              <li key={event.title} className="list-none">
                 <EventCard {...event} />
               </li>
             ))}

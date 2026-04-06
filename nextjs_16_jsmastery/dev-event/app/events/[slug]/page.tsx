@@ -1,9 +1,11 @@
 // @/app/events/[slug]/page.tsx
+import { Suspense } from "react";
 import BookEvent from "@/components/BookEvent";
+import EventCard from "@/components/EventCard";
+import { IEvent } from "@/database";
+import { getEventBySlug, getSimilarEventsBySlug } from "@/lib/actions/event.actions";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const EventDetailItem = ({
   icon,
@@ -49,34 +51,13 @@ const EventTags = ({ tags }: { tags: string[] }) => {
   );
 };
 
-export const EventDetailsPage = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
-  const { slug } = await params;
-  let event;
+async function EventContent({ slug }: { slug: string }) {
+  "use cache";
 
-  try {
-    const request = await fetch(`${BASE_URL}/api/events/${slug}`, {
-      next: { revalidate: 60 },
-    });
+  // This is now safely returning a plain object!
+  const event = await getEventBySlug(slug);
 
-    if (!request.ok) {
-      if (request.status === 404) {
-        return notFound();
-      }
-      throw new Error(`Failed to fetch event: ${request.statusText}`);
-    }
-
-    const response = await request.json();
-    event = response.event;
-
-    if (!event) {
-      return notFound();
-    }
-  } catch (error) {
-    console.error("Error fetching event:", error);
+  if (!event) {
     return notFound();
   }
 
@@ -98,15 +79,20 @@ export const EventDetailsPage = async ({
 
   const bookings = 10;
 
+  // 2. Fetch the raw similar events array
+  const rawSimilarEvents = await getSimilarEventsBySlug(slug);
+
+  // FIX #2: Clean the similar events array
+  const similarEvents: IEvent[] = JSON.parse(JSON.stringify(rawSimilarEvents));
+
   return (
-    <section id="event">
+    <>
       <div className="header">
         <h1>Event Description</h1>
         <p>{description}</p>
       </div>
 
       <div className="details">
-        {/* Left Side - Event Content */}
         <div className="content">
           <Image
             src={image}
@@ -139,16 +125,15 @@ export const EventDetailsPage = async ({
             />
           </section>
 
-          <EventAgenda agendaItems={JSON.parse(agenda[0])} />
+          <EventAgenda agendaItems={agenda} />
 
           <section className="flex-col-gap-2">
             <h2>About the Organizer</h2>
             <p>{organizer}</p>
           </section>
 
-          <EventTags tags={JSON.parse(tags[0])} />
+          <EventTags tags={tags} />
         </div>
-        {/* Right Side - Booking Form */}
         <aside className="booking">
           <div className="signup-card">
             <h2>Book Your Spot</h2>
@@ -164,8 +149,38 @@ export const EventDetailsPage = async ({
           </div>
         </aside>
       </div>
+
+      <div className="flex w-full flex-col gap-4 pt-20">
+        <h2>Similar Events</h2>
+        <div className="events">
+          {similarEvents.length > 0 && similarEvents.map((similarEvent: IEvent) => {
+            return (
+              <EventCard key={similarEvent.title} {...similarEvent} />
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+async function PageContent({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  return (
+    <section id="event">
+      <EventContent slug={slug} />
     </section>
   );
-};
+}
 
-export default EventDetailsPage;
+export default function EventDetailsPage(props: { params: Promise<{ slug: string }> }) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent {...props} />
+    </Suspense>
+  );
+}
