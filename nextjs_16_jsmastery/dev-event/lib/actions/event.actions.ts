@@ -7,7 +7,7 @@ import connectDB from "../mongodb";
 export const getAllEvents = async () => {
   try {
     await connectDB();
-    const events = await Event.find({}).lean();
+    const events = await Event.find({}).sort({ createdAt: -1 }).lean();
 
     // Parse/Stringify to safely convert ObjectIds and Dates to strings
     return JSON.parse(JSON.stringify(events));

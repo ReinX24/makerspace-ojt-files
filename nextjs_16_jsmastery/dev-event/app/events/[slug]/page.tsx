@@ -1,5 +1,4 @@
 // @/app/events/[slug]/page.tsx
-import { Suspense } from "react";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
 import { IEvent } from "@/database";
@@ -51,10 +50,11 @@ const EventTags = ({ tags }: { tags: string[] }) => {
   );
 };
 
-async function EventContent({ slug }: { slug: string }) {
+async function EventContent({ params }: { params: Promise<{ slug: string }> }) {
   "use cache";
 
   // This is now safely returning a plain object!
+  const { slug } = await params;
   const event = await getEventBySlug(slug);
 
   if (!event) {
@@ -164,23 +164,15 @@ async function EventContent({ slug }: { slug: string }) {
   );
 }
 
-async function PageContent({
+export default async function PageContent({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
   return (
     <section id="event">
-      <EventContent slug={slug} />
+      <EventContent params={params} />
     </section>
   );
 }
 
-export default function EventDetailsPage(props: { params: Promise<{ slug: string }> }) {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PageContent {...props} />
-    </Suspense>
-  );
-}
